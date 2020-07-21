@@ -5,6 +5,8 @@ using UnityEngine;
 public class TripleShotBuff : MonoBehaviour
 {
     [SerializeField] private float _buffSpeed = 3.0f;
+    [SerializeField] private int _powerUpID; // 0 = triple shots; 1 = speed; 2 = shields
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,20 +20,39 @@ public class TripleShotBuff : MonoBehaviour
         
         if (transform.position.y <= -5.5f)
         {
-            transform.position = new Vector3(Random.Range(-9.3f, 9.3f), 7.2f, 0);
+            Destroy(this.gameObject);
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player"))
         {
-            Player player = collision.gameObject.GetComponent<Player>();
+            Player player = other.gameObject.GetComponent<Player>();
 
             if (player != null)
             {
-                player.ActiveTripleShot();
-                Destroy(gameObject);
+                switch (_powerUpID)
+                {
+                    case 0:
+                        player.ActiveTripleShot();
+                        Destroy(this.gameObject);
+                        break;
+
+                    case 1:
+                        player.ActiveSpeedBoost();
+                        Destroy(this.gameObject);
+                        break;
+
+                    case 2:
+                        player.ActiveShield();
+                        Destroy(this.gameObject);
+                        break;
+
+                    default:
+                        Debug.Log("Default value");
+                        break;
+                }
             }
         }
     }
