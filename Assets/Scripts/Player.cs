@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject _laserPrefab;
     [SerializeField] private GameObject _tripleShotPrefab;
     [SerializeField] private float _fireRate = 0.3f;
-    [SerializeField] private float _maxHealth = 3f;
+    [SerializeField] private int _maxHealth = 3;
     [SerializeField] private float _speed = 5.5f;
     [SerializeField] private int _score;
      
@@ -161,6 +161,7 @@ public class Player : MonoBehaviour
         else
         {
             _maxHealth = _maxHealth - 1;
+            _uiManager.UpdateLives(_maxHealth);
         }
 
         //if shield is active

@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] private float _enemySpeed = 4.0f;
     private Player _player;
+    
 
     // Start is called before the first frame update
     void Start()
