@@ -56,6 +56,11 @@ public class Player : MonoBehaviour
             FireLaser();
         }
 
+         if(Input.GetKeyDown(KeyCode.F) && _maxHealth > 0) 
+        {
+            this.Damage();
+        }
+
     }
     void CalculateMovement()
     {
