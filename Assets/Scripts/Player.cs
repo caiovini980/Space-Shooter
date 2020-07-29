@@ -5,7 +5,9 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject _shield;
+    [SerializeField] private GameObject[] _engine;
     [SerializeField] private GameObject _laserPrefab;
+    [SerializeField] private GameObject _explosionPrefab;
     [SerializeField] private GameObject _tripleShotPrefab;
     [SerializeField] private float _fireRate = 0.3f;
     [SerializeField] private int _maxHealth = 3;
@@ -13,6 +15,8 @@ public class Player : MonoBehaviour
     [SerializeField] private int _score;
      
     private SpawnManager _spawnManager;
+    //variable to store the audio clip
+    private AudioManager _audioManager;
     private UIManager _uiManager;
     private float _canFire = 0.0f;
     private float _speedMultiplier = 2.0f;
@@ -22,7 +26,7 @@ public class Player : MonoBehaviour
 
     public bool isShieldActive = false;
 
-    //variable reference to the shield visualizer
+    
      
 
 
@@ -32,6 +36,9 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0, 0, 0);
         _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>(); //find the gameObject and get the component
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _audioManager = GameObject.Find("Audio_Manager").GetComponent<AudioManager>();
+        _engine[0].SetActive(false);
+        _engine[1].SetActive(false);
 
         if (_spawnManager == null)
         {
@@ -41,6 +48,11 @@ public class Player : MonoBehaviour
         if (_uiManager == null)
         {
             Debug.LogError("UI Manager is NULL");
+        }
+        
+        if(_audioManager == null)
+        {
+            Debug.LogError("AudioManager is NULL");
         }
 
         _shield.SetActive(false);
@@ -54,6 +66,7 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
         {
             FireLaser();
+            _uiManager.UpdateInstructions();
         }
 
          if(Input.GetKeyDown(KeyCode.F) && _maxHealth > 0) 
@@ -70,21 +83,6 @@ public class Player : MonoBehaviour
         transform.Translate(new Vector3(1, 0, 0) * horizontalInput * _speed * Time.deltaTime);
         transform.Translate(new Vector3(0, 1, 0) * verticalInput * _speed * Time.deltaTime);
 
-        /*if (_isSpeedBoostActive == true)
-        {
-            transform.Translate(new Vector3(1, 0, 0) * horizontalInput * _speedBoost * Time.deltaTime);
-            transform.Translate(new Vector3(0, 1, 0) * verticalInput * _speedBoost * Time.deltaTime);
-        }*/
-/*
-        if (transform.position.y >= 0)
-        {
-            transform.position = new Vector3(transform.position.x, 0, 0);
-        }
-        else if (transform.position.y <= -3.8f)
-        {
-            transform.position = new Vector3(transform.position.x, -3.8f, 0);
-        }
-*/
         transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3.8f, 0), 0);
 
         if (transform.position.x >= 11.2f)
@@ -106,16 +104,14 @@ public class Player : MonoBehaviour
             if (_isTripleShotActive == true)
             {
                 Instantiate(_tripleShotPrefab, new Vector3(transform.position.x - 0.59f, transform.position.y + 0.4f, 0), Quaternion.identity);
-               // _buffDuration = _buffDuration - 1.0f;
-
-               // if (_buffDuration <= 0)
-                //{
-                //    _isTripleShotActive = false;
-                //}
+               //set active sound effect
+               _audioManager.PlayLaserAudio();
             }
             else
             {
                 Instantiate(_laserPrefab, new Vector3(transform.position.x, transform.position.y + 0.7f, 0), Quaternion.identity);
+                //set active sound effect
+                _audioManager.PlayLaserAudio();
             }
         }
     }
@@ -168,16 +164,24 @@ public class Player : MonoBehaviour
             _maxHealth = _maxHealth - 1;
             _uiManager.UpdateLives(_maxHealth);
         }
-
-        //if shield is active
-        //do nothing "return;"
-        //deactivate shields
-
-        if (_maxHealth <= 0)
+        
+        switch(_maxHealth)
         {
-            Destroy(this.gameObject);
-            _spawnManager.OnPlayerDeath();
-        }
+            case 2:
+                _engine[Random.Range(0, 1)].SetActive(true);
+            break;
+            
+            case 1:
+                _engine[0].SetActive(true);
+                _engine[1].SetActive(true);
+            break;
+
+            case 0: 
+                Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+                Destroy(this.gameObject, 0.18f);
+                _spawnManager.OnPlayerDeath();
+            break;
+        }   
     }
 
     public void AddScore(int points)

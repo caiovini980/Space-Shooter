@@ -10,7 +10,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Sprite[] _liveSprites;
     [SerializeField] private Image _livesImage;
     [SerializeField] private GameObject _gameOver;
+    [SerializeField] private GameObject _shoot;
+    [SerializeField] private GameObject _move;
     [SerializeField] private GameObject _restartText;
+    [SerializeField] private GameObject _returnMenuText;
     private bool _restartGame = true;
     private GameManager _gameManager;
 
@@ -20,7 +23,10 @@ public class UIManager : MonoBehaviour
         //assign text component to the handle
         _scoreText.text = "Score: " + 0;
         _gameOver.SetActive(false);
+        _shoot.SetActive(true);
+        _move.SetActive(true);
         _restartText.SetActive(false);
+        _returnMenuText.SetActive(false);
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
 
         if(_gameManager == null)
@@ -47,11 +53,18 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void UpdateInstructions()
+    {
+        _shoot.SetActive(false);
+        _move.SetActive(false);
+    }
+
     void GameOverSequence()
     {
         _gameManager.GameOver();
         _restartGame = false;
         _restartText.SetActive(true);
+        _returnMenuText.SetActive(true);
         StartCoroutine(GameOverScreen());  
     }
 

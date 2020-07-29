@@ -6,10 +6,17 @@ public class TripleShotBuff : MonoBehaviour
 {
     [SerializeField] private float _buffSpeed = 3.0f;
     [SerializeField] private int _powerUpID; // 0 = triple shots; 1 = speed; 2 = shields
+    private AudioManager _audioManager;
 
     // Start is called before the first frame update
     void Start()
     {
+        _audioManager = GameObject.Find("Audio_Manager").GetComponent<AudioManager>();
+
+        if(_audioManager == null)
+        {
+            Debug.LogError("AudioManager is NULL");
+        }
         transform.position = new Vector3(Random.Range(-9.3f, 9.3f), 7.2f, 0);
     }
 
@@ -36,16 +43,19 @@ public class TripleShotBuff : MonoBehaviour
                 {
                     case 0:
                         player.ActiveTripleShot();
+                        _audioManager.PlayPowerUpAudio();
                         Destroy(this.gameObject);
                         break;
 
                     case 1:
                         player.ActiveSpeedBoost();
+                        _audioManager.PlayPowerUpAudio();
                         Destroy(this.gameObject);
                         break;
 
                     case 2:
                         player.ActiveShield();
+                        _audioManager.PlayPowerUpAudio();
                         Destroy(this.gameObject);
                         break;
 

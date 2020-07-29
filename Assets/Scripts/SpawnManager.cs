@@ -5,6 +5,7 @@ using UnityEngine;
 public class SpawnManager : MonoBehaviour
 {
     [SerializeField] private GameObject _enemyPrefab;
+    [SerializeField] private GameObject _asteroidPrefab;
     //[SerializeField] private GameObject _tripleShotPrefab;
     //[SerializeField] private GameObject _speedBoostPrefab;
     [SerializeField] private GameObject _enemyContainer;
@@ -17,30 +18,33 @@ public class SpawnManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        Vector3 positionToSpawn = new Vector3(Random.Range(-9.3f, 9.3f), 7.2f, 0);
+
+        GameObject asteroid1 = Instantiate(_asteroidPrefab, positionToSpawn, Quaternion.identity);
+    }
+
+    public void StartSpawning()
+    {
         _enemyCoroutine = SpawnEnemyRoutine(3.0f);
         StartCoroutine(_enemyCoroutine);
 
         _powerupCoroutine = SpawnPowerupRoutine(Random.Range(3.0f, 7.0f));
         StartCoroutine(_powerupCoroutine);
-
-        /*_speedBoostCoroutine = SpawnSpeedBoostRoutine(Random.Range(10.0f, 15.0f));
-        StartCoroutine(_speedBoostCoroutine);*/
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     IEnumerator SpawnEnemyRoutine(float _spawnTime)
     {
+        yield return new WaitForSeconds(2.0f);
         while(_stopSpawning == false)
         {
             Vector3 positionToSpawn = new Vector3(Random.Range(-9.3f, 9.3f), 7.2f, 0);
 
             GameObject newEnemy = Instantiate(_enemyPrefab, positionToSpawn, Quaternion.identity);
+            GameObject newEnemy2 = Instantiate(_enemyPrefab, positionToSpawn, Quaternion.identity);
+
             newEnemy.transform.parent = _enemyContainer.transform;
+            newEnemy2.transform.parent = _enemyContainer.transform;
             yield return new WaitForSeconds(_spawnTime);
         }
     }
